@@ -48,6 +48,11 @@ flutter:
   assets:
     - assets/detection.jpg
     - assets/logo-logomark.png
+    - assets/imgs/fb.png
+    - assets/imgs/fl.png
+    - assets/imgs/gcp.png
+    - assets/imgs/ng.png
+    - assets/imgs/tf.jpg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
