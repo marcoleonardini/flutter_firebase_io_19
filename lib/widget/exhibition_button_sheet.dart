@@ -1,9 +1,25 @@
 import 'dart:ui';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_io_19/data/event.dart';
 import 'package:flutter_firebase_io_19/widget/sheet_header.dart';
 
 const double minHeight = 120;
+const double iconStartSize = 30; 
+const double iconEndSize = 60;  
+const double iconStartMarginTop = 36; 
+const double iconEndMarginTop = 80;  
+const double iconsVerticalSpacing = 24;  
+const double iconsHorizontalSpacing = 16; 
+
+final List<Event> events = [
+  Event('detection.jpg', 'Shenzhen GLOBAL DESIGN AWARD 2018', '4.20-30'),
+  Event('detection.jpg', 'Shenzhen GLOBAL DESIGN AWARD 2018', '4.20-30'),
+  Event('detection.jpg', 'Dawan District Guangdong Hong Kong', '4.28-31'),
+  Event('detection.jpg', 'Dawan District Guangdong Hong Kong', '4.28-31'),
+  Event('detection.jpg', 'Dawan District Guangdong Hong Kong', '4.28-31'),
+  
+];
 
 class ExhibitionBottomSheet extends StatefulWidget {
   ExhibitionBottomSheet({Key key}) : super(key: key);
@@ -14,7 +30,7 @@ class ExhibitionBottomSheet extends StatefulWidget {
 class _ExhibitionBottomSheetState extends State<ExhibitionBottomSheet>
     with TickerProviderStateMixin {
   AnimationController _controller;
-  double get maxHeight => MediaQuery.of(context).size.height;
+  double get maxHeight => MediaQuery.of(context).size.height-80;
 
   @override
   void initState() {
@@ -28,6 +44,17 @@ class _ExhibitionBottomSheetState extends State<ExhibitionBottomSheet>
     super.dispose();
     _controller.dispose();
   }
+
+  double get itemBorderRadius => lerp(8, 24);
+   double get iconSize => lerp(iconStartSize, iconEndSize);
+
+  double iconTopMargin(int index) =>
+      lerp(iconStartMarginTop,
+          iconEndMarginTop + index * (iconsVerticalSpacing + iconEndSize)) +
+      headerTopMargin; 
+
+  double iconLeftMargin(int index) =>
+      lerp(index * (iconsHorizontalSpacing + iconStartSize), 0);
 
   double lerp(double min, double max) =>
       lerpDouble(min, max, _controller.value);
@@ -63,7 +90,9 @@ class _ExhibitionBottomSheetState extends State<ExhibitionBottomSheet>
                     SheetHeader(
                       fontSize: headerFontSize,
                       topMargin: headerTopMargin,
-                    )
+                    ),
+                    for(Event event in events)
+                    _buildIcon(event),
                   ],
                 ),
               ),
@@ -71,7 +100,26 @@ class _ExhibitionBottomSheetState extends State<ExhibitionBottomSheet>
           ),
     );
   }
-
+    Widget _buildIcon(Event event) {
+    int index = events.indexOf(event);
+    return Positioned(
+      height: iconSize,
+      width: iconSize, 
+      top: iconTopMargin(index), 
+      left: iconLeftMargin(index),
+      child: ClipRRect(
+        borderRadius: BorderRadius.horizontal(
+          left: Radius.circular(itemBorderRadius), 
+          right: Radius.circular(itemBorderRadius),
+        ),
+        child: Image.asset(
+          'assets/${event.assetName}',
+          fit: BoxFit.cover,
+          alignment: Alignment(lerp(1, 0), 0), 
+        ),
+      ),
+    );
+  }
   void _togle() {
     final bool isOpen = _controller.status == AnimationStatus.completed;
     _controller.fling(velocity: isOpen ? -2 : 2);
