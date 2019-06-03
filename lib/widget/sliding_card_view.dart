@@ -1,6 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_firebase_io_19/screen/view_detail.dart';
+import 'package:flutter_firebase_io_19/screen/view_detail_faces.dart';
+import 'package:flutter_firebase_io_19/screen/view_detail_labels.dart';
+import 'package:flutter_firebase_io_19/screen/view_detail_text.dart';
 import 'package:flutter_firebase_io_19/widget/sliding_card.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:image_picker/image_picker.dart';
@@ -46,32 +50,25 @@ class _SlidingCardsViewState extends State<SlidingCardsView> {
         controller: pageController,
         children: <Widget>[
           SlidingCard(
-            title: 'Ml-Kit',
-            description: '4-20-30',
-            assetName: 'logo-logomark.png',
+            title: 'Image And Detect Barcodes',
+            description: '',
+            assetName: 'qr.png',
             offset: pageOffset,
-            onPressed: () {},
+            onPressed: _getImageAndDetectBarcodes,
           ),
           SlidingCard(
-            title: 'Ml-Kit',
+            title: 'Image And Detect Text',
             description: '4-20-30',
-            assetName: 'detection.jpg',
+            assetName: 'text.png',
             offset: pageOffset - 1,
-            onPressed: () {},
+            onPressed: _getImageAndDetectText,
           ),
           SlidingCard(
-            title: 'Ml-Kit',
+            title: 'Image And Detect Image   Labeler',
             description: '4-20-30',
-            assetName: 'detection.jpg',
+            assetName: 'context.png',
             offset: pageOffset - 2,
-            onPressed: () {},
-          ),
-          SlidingCard(
-            title: 'Ml-Kit',
-            description: '4-20-30',
-            assetName: 'detection.jpg',
-            offset: pageOffset - 3,
-            onPressed: () {},
+            onPressed: _getImageAndDetectImageLabeler,
           )
         ],
       ),
@@ -79,58 +76,68 @@ class _SlidingCardsViewState extends State<SlidingCardsView> {
   }
 
   void _getImageAndDetectBarcodes() async {
-    final imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
+    final imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
     final image = FirebaseVisionImage.fromFile(imageFile);
     final barCodeDetector = FirebaseVision.instance.barcodeDetector();
     final barcodes = await barCodeDetector.detectInImage(image);
     if (mounted) {
-      setState(() {
-        print('mounted');
-        _imageFile = imageFile;
-        _barcodes = barcodes;
-      });
+      print('barcodes ${barcodes.length}');
+       Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ViewDetail(
+                  imageFile: imageFile,
+                  faces: barcodes,
+                )));
     }
   }
 
   void _getImageAndDetectText() async {
-    final imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
+    final imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
     final image = FirebaseVisionImage.fromFile(imageFile);
     final barCodeDetector = FirebaseVision.instance.textRecognizer();
     final texts = await barCodeDetector.processImage(image);
-    if (mounted) {
+    if (mounted && imageFile != null) {
       setState(() {
         print('mounted');
         _imageFile = imageFile;
         _texts = texts;
       });
+
+       Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ViewDetailText(
+                  imageFile: imageFile,
+                  texts: texts,
+                )));
+
     }
   }
 
   void _getImageAndDetectFaces() async {
-    final imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
+    final imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
     final image = FirebaseVisionImage.fromFile(imageFile);
     final barCodeDetector = FirebaseVision.instance.faceDetector();
-    final faces = await barCodeDetector.processImage(image);
+    List<Face> faces = await barCodeDetector.processImage(image);
+    print(faces[0].boundingBox);
     if (mounted) {
-      setState(() {
-        print('mounted');
-        _imageFile = imageFile;
-        _faces = faces;
-      });
+         Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ViewDetailFaces(
+                  imageFile: imageFile,
+                  faces: faces,
+                )));
     }
   }
 
   void _getImageAndDetectImageLabeler() async {
-    final imageFile = await ImagePicker.pickImage(source: ImageSource.camera);
+    final imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
     final image = FirebaseVisionImage.fromFile(imageFile);
     final barCodeDetector = FirebaseVision.instance.imageLabeler();
     final imageLabels = await barCodeDetector.processImage(image);
     if (mounted) {
-      setState(() {
-        print('mounted');
-        _imageFile = imageFile;
-        _imageLabels = imageLabels;
-      });
+
+       Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => ViewDetailImageLabel(
+                  imageFile: imageFile,
+                  faces: imageLabels,
+                )));
     }
   }
 }

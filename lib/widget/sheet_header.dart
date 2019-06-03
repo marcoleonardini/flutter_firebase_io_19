@@ -12,7 +12,7 @@ class SheetHeader extends StatelessWidget {
     return Positioned(
       top: topMargin,
       child: Text(
-        'Puntos Gandos',
+        'Puntos Ganados',
         style: TextStyle(
           color: Colors.white,
           fontSize: fontSize,
